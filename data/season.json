@@ -1,7 +1,75 @@
 {
   "version": 1,
-  "savedAt": "2026-09-01T00:00:00Z",
+  "savedAt": "2026-09-01T20:27:32.109Z",
   "teamName": "Heize",
-  "players": [],
+  "players": [
+    {
+      "name": "Nick",
+      "position": "ponta",
+      "number": 14,
+      "active": true,
+      "id": "ddqry7qw"
+    },
+    {
+      "name": "Arthur",
+      "position": "ponta",
+      "active": true,
+      "id": "73tq9oag"
+    },
+    {
+      "name": "João",
+      "position": "ponta",
+      "active": true,
+      "id": "ys5nmhsq"
+    },
+    {
+      "name": "Verroy",
+      "position": "ponta",
+      "active": true,
+      "id": "4i3vpo36"
+    },
+    {
+      "name": "Pedrinho",
+      "position": "oposto",
+      "active": true,
+      "id": "lp6ayhs8"
+    },
+    {
+      "name": "Daniel",
+      "position": "oposto",
+      "active": false,
+      "id": "p5s7i3zk"
+    },
+    {
+      "name": "Henrique",
+      "position": "levantador",
+      "active": true,
+      "id": "k2g26qik"
+    },
+    {
+      "name": "Mikael",
+      "position": "levantador",
+      "active": true,
+      "id": "e5ds5xeo"
+    },
+    {
+      "name": "Marcos",
+      "position": "libero",
+      "active": true,
+      "id": "pu80vxkc"
+    },
+    {
+      "name": "Nicolas",
+      "position": "central",
+      "active": true,
+      "id": "a6psv58p"
+    },
+    {
+      "name": "Othavio",
+      "position": "central",
+      "active": true,
+      "id": "cx1m6jus"
+    }
+  ],
   "matches": []
 }
