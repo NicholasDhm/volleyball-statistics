@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
 import { useTeamStore } from "@/store/useTeamStore"
 import {
   fetchRemote,
@@ -48,6 +47,8 @@ export function SyncButton() {
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [passwordInput, setPasswordInput] = useState("")
   const [conflict, setConflict] = useState<RemoteState | null>(null)
+  const [discardOpen, setDiscardOpen] = useState(false)
+  const [discarding, setDiscarding] = useState(false)
   const bootRan = useRef(false)
 
   // Sincroniza uma vez ao montar: pega o que está no repositório e decide se
@@ -145,6 +146,29 @@ export function SyncButton() {
     toast.success("Dados locais substituídos pelos do repositório")
   }
 
+  /**
+   * Volta ao que está publicado. Sem isso o time fica preso numa alteração que não
+   * quer salvar: o localStorage guarda tudo na hora e o refresh não desfaz nada.
+   */
+  async function handleDiscard() {
+    setDiscarding(true)
+    try {
+      const remote = await fetchRemote()
+      if (remote.data) {
+        adoptRemote(remote.data, remote.sha)
+        toast.success("Alterações descartadas — voltou ao que está publicado")
+      } else {
+        adoptRemote({ teamName: "Meu Time", players: [], matches: [] }, remote.sha)
+        toast.success("Alterações descartadas — não há nada publicado ainda")
+      }
+      setDiscardOpen(false)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não consegui buscar a versão publicada")
+    } finally {
+      setDiscarding(false)
+    }
+  }
+
   const disabled = offline || saving || pending.total === 0
   const label = offline
     ? "Sincronização indisponível"
@@ -180,14 +204,51 @@ export function SyncButton() {
         )}
       </Button>
       {!offline && (
-        <p className={cn("mt-1 truncate text-xs text-muted-foreground")} title={describePending(pending)}>
-          {pending.total === 0
-            ? lastSavedAt
-              ? `Salvo às ${format(lastSavedAt, "HH:mm")}`
-              : "—"
-            : describePending(pending)}
-        </p>
+        <div className="mt-1 flex items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground" title={describePending(pending)}>
+            {pending.total === 0
+              ? lastSavedAt
+                ? `Salvo às ${format(lastSavedAt, "HH:mm")}`
+                : "—"
+              : describePending(pending)}
+          </p>
+          {pending.total > 0 && (
+            <button
+              type="button"
+              onClick={() => setDiscardOpen(true)}
+              className="shrink-0 text-xs text-muted-foreground underline-offset-2 hover:text-destructive hover:underline"
+            >
+              Descartar
+            </button>
+          )}
+        </div>
       )}
+
+      <Dialog open={discardOpen} onOpenChange={(open) => !discarding && setDiscardOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Descartar alterações não salvas?</DialogTitle>
+            <DialogDescription>
+              Isto joga fora {describePending(pending)} e traz de volta o que está publicado no
+              repositório. Não dá para desfazer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" disabled={discarding} onClick={() => setDiscardOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="outline"
+              disabled={discarding}
+              onClick={handleDiscard}
+              className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              {discarding ? <Loader2 className="animate-spin" /> : null}
+              Descartar e recarregar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
         <DialogContent>
