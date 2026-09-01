@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { format, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
-import { Download, FileJson, RotateCcw, Trash2, Upload } from "lucide-react"
+import { Download, FileJson, Trash2, Upload } from "lucide-react"
 
 import { PageHeader, PositionBadge, StatTile } from "@/components/kit"
 import { Button } from "@/components/ui/button"
@@ -250,7 +250,6 @@ export default function Report() {
   const matches = useMatches()
   const teamName = useTeamStore((s) => s.teamName)
   const importState = useTeamStore((s) => s.importState)
-  const loadDemo = useTeamStore((s) => s.loadDemo)
   const resetAll = useTeamStore((s) => s.resetAll)
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -330,11 +329,6 @@ export default function Report() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha ao importar o arquivo.")
     }
-  }
-
-  function handleLoadDemo() {
-    loadDemo()
-    toast.success("Dados de demonstração recarregados.")
   }
 
   function handleResetAll() {
@@ -467,14 +461,12 @@ export default function Report() {
         <div>
           <h3 className="text-sm font-semibold text-destructive">Zona de dados</h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Os dados desta temporada ficam salvos apenas neste navegador (localStorage) — não há sincronização com
-            nenhum servidor.
+            O que você lança fica neste navegador na hora, e vai para o repositório quando você
+            clica em «Salvar dados». Apagar aqui limpa só este navegador — o que já foi publicado
+            continua lá.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={handleLoadDemo}>
-            <RotateCcw className="size-4" /> Recarregar dados de demonstração
-          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive" size="sm">

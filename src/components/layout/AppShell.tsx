@@ -218,11 +218,20 @@ function Brand({ editable = true }: { editable?: boolean }) {
           </div>
         )}
         {editing ? null : (
-          <div className="text-[11px] leading-tight text-muted-foreground">Estatísticas</div>
+          <div className="text-[11px] leading-tight text-muted-foreground">Voleibol</div>
         )}
       </div>
     </div>
   )
+}
+
+/** O título da aba acompanha o nome do time. */
+function DocumentTitle() {
+  const teamName = useTeamStore((s) => s.teamName)
+  useEffect(() => {
+    document.title = `${teamName.trim() || "Meu Time"} Voleibol`
+  }, [teamName])
+  return null
 }
 
 /** Trocar de rota volta ao topo — sem isso a página nova abre no meio. */
@@ -243,6 +252,7 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen bg-background">
       <ScrollToTop />
+      <DocumentTitle />
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar p-3 lg:flex">
         <Brand />
         <div className="mt-5 flex-1"><NavItems /></div>

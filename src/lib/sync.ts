@@ -51,13 +51,31 @@ async function readJson(res: Response): Promise<Record<string, unknown>> {
   }
 }
 
+/**
+ * Um arquivo pode existir sem conter uma temporada — o `{}` que inicializa a branch, um
+ * JSON truncado, uma edição manual errada. Adotar isso quebraria o app, então tudo que
+ * não tem a forma esperada vale como "ainda não há nada publicado".
+ */
+export function isSeasonFile(x: unknown): x is SeasonFile {
+  if (!x || typeof x !== "object") return false
+  const f = x as Partial<SeasonFile>
+  return (
+    typeof f.teamName === "string" &&
+    Array.isArray(f.players) &&
+    Array.isArray(f.matches) &&
+    f.players.every((p) => p && typeof p.id === "string" && typeof p.name === "string") &&
+    f.matches.every((m) => m && typeof m.id === "string" && Array.isArray(m.sets))
+  )
+}
+
 export async function fetchRemote(): Promise<RemoteState> {
   const res = await fetch(ENDPOINT, { cache: "no-store" }).catch(() => {
     throw new SyncError("Não consegui falar com a API de sincronização", 0)
   })
   const body = await readJson(res)
   if (!res.ok) throw new SyncError((body.error as string) ?? `Erro ${res.status}`, res.status)
-  return { data: (body.data as SeasonFile) ?? null, sha: (body.sha as string) ?? null }
+  const data = isSeasonFile(body.data) ? body.data : null
+  return { data, sha: (body.sha as string) ?? null }
 }
 
 export async function pushRemote(args: {
@@ -79,7 +97,7 @@ export async function pushRemote(args: {
   const body = await readJson(res)
   if (res.status === 409) {
     throw new SyncError("Alguém salvou antes de você", 409, {
-      data: (body.remote as SeasonFile) ?? null,
+      data: isSeasonFile(body.remote) ? body.remote : null,
       sha: (body.sha as string) ?? null,
     })
   }

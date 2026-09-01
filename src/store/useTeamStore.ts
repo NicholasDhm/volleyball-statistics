@@ -1,7 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { Match, Player, Position } from "@/lib/types"
-import { buildDemoSeason } from "@/data/demo"
 import type { Snapshot } from "@/lib/sync"
 
 const uid = () => Math.random().toString(36).slice(2, 10)
@@ -37,7 +36,6 @@ interface TeamState {
   /** Substitui tudo pelo que veio do repositório. */
   adoptRemote: (snapshot: Snapshot, sha: string | null) => void
 
-  loadDemo: () => void
   resetAll: () => void
   importState: (data: { teamName?: string; players: Player[]; matches: Match[] }) => void
 }
@@ -152,19 +150,21 @@ export const useTeamStore = create<TeamState>()(
       markSaved: (snapshot, sha) =>
         set({ lastSaved: structuredClone(snapshot), remoteSha: sha }),
 
-      adoptRemote: (snapshot, sha) =>
+      adoptRemote: (snapshot, sha) => {
+        // defensivo de propósito: um arquivo remoto malformado não pode derrubar o app
+        const safe: Snapshot = {
+          teamName: snapshot?.teamName ?? "Meu Time",
+          players: Array.isArray(snapshot?.players) ? snapshot.players : [],
+          matches: Array.isArray(snapshot?.matches) ? snapshot.matches : [],
+        }
         set({
-          teamName: snapshot.teamName,
-          players: snapshot.players,
-          matches: [...snapshot.matches].sort((a, b) => b.date.localeCompare(a.date)),
-          lastSaved: structuredClone(snapshot),
+          ...safe,
+          matches: [...safe.matches].sort((a, b) => b.date.localeCompare(a.date)),
+          lastSaved: structuredClone(safe),
           remoteSha: sha,
-        }),
-
-      loadDemo: () => {
-        const d = buildDemoSeason()
-        set({ players: d.players, matches: d.matches })
+        })
       },
+
       resetAll: () => set({ players: [], matches: [], teamName: "Meu Time" }),
       importState: (data) =>
         set({
@@ -176,29 +176,9 @@ export const useTeamStore = create<TeamState>()(
     {
       name: "volei-stats-v1",
       version: 3,
-      /**
-       * A demo original gerava as ações sem amarração com o placar (uma partida de 5 sets
-       * aparecia com 200+ pontos conquistados) e não tinha pontos disputados. A v2 só repunha
-       * o estado 100% intocado, então quem já tinha criado uma partida ficou preso nos números
-       * velhos. Agora trocamos partida a partida: cada jogo da demonstração volta na versão
-       * nova, e o que o time criou fica intocado.
-       */
-      migrate: (persisted, version) => {
-        const state = persisted as { players?: Player[]; matches?: Match[] } | undefined
-        if (version >= 3 || !state?.matches) return persisted
-        const fresh = buildDemoSeason()
-        const freshById = new Map(fresh.matches.map((m) => [m.id, m]))
-        const matches = state.matches.map((m) => freshById.get(m.id) ?? m)
-        // o elenco da demo ganha id estável; só repõe se ainda for exatamente o mesmo conjunto
-        const sameRoster =
-          state.players?.length === fresh.players.length &&
-          state.players.every((p, i) => p.id === fresh.players[i].id)
-        return {
-          ...state,
-          players: sameRoster ? fresh.players : state.players,
-          matches: matches.sort((a, b) => b.date.localeCompare(a.date)),
-        }
-      },
+      // versões antigas guardavam uma temporada de demonstração; hoje o app começa vazio
+      // e só recebe dados reais, então migrar é apenas preservar o que o time já lançou.
+      migrate: (persisted) => persisted,
     },
   ),
 )

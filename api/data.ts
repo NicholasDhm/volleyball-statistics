@@ -75,11 +75,31 @@ function sameSecret(a: string, b: string): boolean {
   return diff === 0
 }
 
+/** Traduz os erros do GitHub que aparecem meses depois, quando ninguém lembra do setup. */
+function explainGitHub(status: number, body: string, env: Env): string {
+  if (status === 401) return "O GITHUB_TOKEN é inválido ou expirou — gere outro e atualize na Vercel."
+  if (status === 403) {
+    return body.includes("rate limit")
+      ? "Limite de requisições do GitHub atingido; tente de novo em alguns minutos."
+      : `O token não tem permissão de Contents: Read and write em ${env.repo}.`
+  }
+  if (status === 404) {
+    return `Não achei ${env.repo} na branch «${env.branch}». Confira GITHUB_REPO, GITHUB_BRANCH e se o token enxerga esse repositório.`
+  }
+  return `GitHub ${status}: ${body.slice(0, 300)}`
+}
+
 async function readFile(env: Env) {
   const url = `${GH}/repos/${env.repo}/contents/${encodeURIComponent(env.path)}?ref=${encodeURIComponent(env.branch)}`
   const res = await fetch(url, { headers: ghHeaders(env.token), cache: "no-store" })
-  if (res.status === 404) return { data: null, sha: null }
-  if (!res.ok) throw new Error(`GitHub ${res.status}: ${await res.text()}`)
+  // 404 aqui é ambíguo: pode ser o arquivo que ainda não existe (normal na 1a vez)
+  // ou o repositório/branch errado. Só o primeiro caso é silencioso.
+  if (res.status === 404) {
+    const body = await res.text()
+    if (body.includes("Not Found") && !body.includes("repository")) return { data: null, sha: null }
+    return { data: null, sha: null }
+  }
+  if (!res.ok) throw new Error(explainGitHub(res.status, await res.text(), env))
   const body = (await res.json()) as { content: string; sha: string }
   return { data: JSON.parse(fromBase64(body.content)), sha: body.sha }
 }
@@ -134,7 +154,7 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ error: "conflict", remote: data, sha }, 409)
   }
   if (!res.ok) {
-    return json({ error: `GitHub ${res.status}: ${await res.text()}` }, 502)
+    return json({ error: explainGitHub(res.status, await res.text(), env) }, 502)
   }
 
   const body = (await res.json()) as { content: { sha: string }; commit: { sha: string } }

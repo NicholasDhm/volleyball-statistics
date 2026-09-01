@@ -21,8 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { EmptyState, PageHeader, PositionBadge, ResultBadge, StatTile } from "@/components/kit"
 import { ChartCard, Legend, axisProps, gridProps, makeTooltip, seriesColor } from "@/components/charts/chart-kit"
-import { useMatches, usePlayers, useTeamStore } from "@/store/useTeamStore"
-import { toast } from "sonner"
+import { useMatches, usePlayers } from "@/store/useTeamStore"
 import { TeamNameEditor } from "@/components/layout/AppShell"
 import { PositionEfficiencyCard } from "@/components/PositionEfficiency"
 import { POSITION_STATS, positionMeta } from "@/lib/stats"
@@ -116,7 +115,6 @@ function LeaderCard({
 export default function Dashboard() {
   const matches = useMatches()
   const players = usePlayers()
-  const loadDemo = useTeamStore((st) => st.loadDemo)
   const [seasonFilter, setSeasonFilter] = useState<SeasonFilter>("all")
 
   const competitions = useMemo(() => {
@@ -228,16 +226,6 @@ export default function Dashboard() {
               >
                 Montar o elenco
               </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  loadDemo()
-                  toast.success("Temporada de demonstração carregada")
-                }}
-                className="inline-flex h-9 items-center rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                Ver com dados de exemplo
-              </button>
             </div>
           }
         />
