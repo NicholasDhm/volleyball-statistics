@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-09-02T14:16:18.475Z",
+  "savedAt": "2026-09-03T22:44:54.019Z",
   "teamName": "Heize",
   "players": [
     {
@@ -75,6 +75,122 @@
     {
       "stats": {
         "k2g26qik": {
+          "set_ponta": 21,
+          "set_central": 9,
+          "set_saida": 10,
+          "set_pipe": 3,
+          "pontos_jogados": 70
+        },
+        "73tq9oag": {
+          "largada": 2,
+          "passe_certo": 12,
+          "block_contra": 2,
+          "def_certa": 1,
+          "passe_errado": 1,
+          "def_contra": 6,
+          "ataque_certo": 3,
+          "block_pro": 3,
+          "cobertura": 1,
+          "pontos_jogados": 85
+        },
+        "ys5nmhsq": {
+          "passe_certo": 8,
+          "cobertura": 1,
+          "ataque_certo": 4,
+          "saque_errado": 1,
+          "block_contra": 2,
+          "def_contra": 1,
+          "block_pro": 3,
+          "ataque_errado": 1,
+          "pontos_jogados": 73
+        },
+        "cx1m6jus": {
+          "fintado": 2,
+          "pontos_jogados": 43,
+          "block_pro": 2,
+          "largada": 1,
+          "block_contra": 1,
+          "saque_errado": 2,
+          "ataque_certo": 1
+        },
+        "pu80vxkc": {
+          "pontos_jogados": 68,
+          "passe_c": 3,
+          "def_certa": 1,
+          "passe_a": 8,
+          "passe_errado": 2,
+          "passe_b": 4
+        },
+        "p5s7i3zk": {
+          "saque_certo": 3,
+          "largada": 2,
+          "ataque_certo": 3,
+          "saque_errado": 1,
+          "ataque_errado": 2,
+          "def_certa": 4,
+          "def_contra": 3,
+          "block_contra": 1,
+          "pontos_jogados": 70
+        },
+        "e5ds5xeo": {
+          "set_central": 1,
+          "set_ponta": 2,
+          "pontos_jogados": 17
+        },
+        "a6psv58p": {
+          "pontos_jogados": 44,
+          "ataque_certo": 3,
+          "fintado": 2,
+          "cobertura": 1
+        },
+        "4i3vpo36": {
+          "passe_certo": 1,
+          "ataque_certo": 1,
+          "saque_errado": 1,
+          "def_certa": 1,
+          "pontos_jogados": 15
+        },
+        "ddqry7qw": {
+          "pontos_jogados": 2,
+          "ataque_certo": 1
+        },
+        "lp6ayhs8": {
+          "pontos_jogados": 17,
+          "saque_certo": 1
+        }
+      },
+      "lineup": [
+        "k2g26qik",
+        "e5ds5xeo",
+        "lp6ayhs8",
+        "p5s7i3zk",
+        "ddqry7qw",
+        "73tq9oag",
+        "ys5nmhsq",
+        "4i3vpo36",
+        "pu80vxkc",
+        "a6psv58p",
+        "cx1m6jus"
+      ],
+      "date": "2026-09-02",
+      "opponent": "Voleibolaticos",
+      "competition": "Ace Cup",
+      "location": "casa",
+      "sets": [
+        {
+          "us": 25,
+          "them": 20
+        },
+        {
+          "us": 25,
+          "them": 17
+        }
+      ],
+      "id": "yquh9i2s"
+    },
+    {
+      "stats": {
+        "k2g26qik": {
           "pontos_jogados": 79,
           "set_ponta": 19,
           "set_saida": 16,
@@ -133,7 +249,6 @@
           "def_contra": 2,
           "passe_certo": 4,
           "passe_errado": 2,
-          "quinou": 11,
           "block_pro": 1
         },
         "4i3vpo36": {
